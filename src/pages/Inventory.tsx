@@ -8,21 +8,28 @@ export function InventoryPage(): JSX.Element {
   const { state, setState } = useStore();
   const inventory = Array.isArray(state.inventory) ? state.inventory : [];
   const [editing, setEditing] = useState<null | InventoryItem>(null);
-  const [form, setForm] = useState<Omit<InventoryItem, "id">>({ name: "", sku: "", costPrice: 0, sellingPrice: 0, stock: 0 });
+  const [form, setForm] = useState<{ name: string; sku: string; costPrice: number | ""; sellingPrice: number | ""; stock: number | "" }>({ name: "", sku: "", costPrice: "", sellingPrice: "", stock: "" });
 
-  function reset() { setForm({ name: "", sku: "", costPrice: 0, sellingPrice: 0, stock: 0 }); setEditing(null); }
+  function reset() { setForm({ name: "", sku: "", costPrice: "", sellingPrice: "", stock: "" }); setEditing(null); }
 
   function save() {
     if (!form.name.trim() || !form.sku.trim()) { alert("Missing fields"); return; }
+    const normalized = {
+      name: form.name,
+      sku: form.sku,
+      costPrice: form.costPrice === "" ? 0 : Number(form.costPrice),
+      sellingPrice: form.sellingPrice === "" ? 0 : Number(form.sellingPrice),
+      stock: form.stock === "" ? 0 : Number(form.stock),
+    };
     if (editing) {
-      setState(prev => ({ ...prev, inventory: (Array.isArray(prev.inventory)?prev.inventory:[]).map(i => i.id === editing.id ? { ...editing, ...form } : i) }));
+      setState(prev => ({ ...prev, inventory: (Array.isArray(prev.inventory)?prev.inventory:[]).map(i => i.id === editing.id ? { ...editing, ...normalized } : i) }));
     } else {
-      setState(prev => ({ ...prev, inventory: [{ id: uid("I"), ...form }, ...(Array.isArray(prev.inventory)?prev.inventory:[])] }));
+      setState(prev => ({ ...prev, inventory: [{ id: uid("I"), ...normalized }, ...(Array.isArray(prev.inventory)?prev.inventory:[])] }));
     }
     reset();
   }
 
-  function edit(item: InventoryItem) { setEditing(item); setForm({ name: item.name, sku: item.sku, costPrice: item.costPrice, sellingPrice: item.sellingPrice, stock: item.stock }); }
+  function edit(item: InventoryItem) { setEditing(item); setForm({ name: item.name, sku: item.sku, costPrice: String(item.costPrice) as unknown as number|"", sellingPrice: String(item.sellingPrice) as unknown as number|"", stock: String(item.stock) as unknown as number|"" }); }
   function remove(id: string) { if (!confirm("Delete item?")) return; setState(prev => ({ ...prev, inventory: prev.inventory.filter(i => i.id !== id) })); }
 
   const profitInsights = useMemo(() => inventory.map(i => ({
@@ -32,6 +39,7 @@ export function InventoryPage(): JSX.Element {
     marginPerUnit: Math.max(0, i.sellingPrice - i.costPrice),
     potentialProfit: Math.max(0, (i.sellingPrice - i.costPrice) * i.stock)
   })), [inventory]);
+  const totalPotential = useMemo(() => profitInsights.reduce((sum, r) => sum + r.potentialProfit, 0), [profitInsights]);
 
   return (
     <div className="space-y-4">
@@ -49,15 +57,36 @@ export function InventoryPage(): JSX.Element {
             </div>
             <div>
               <label className="text-xs opacity-60">Cost Price</label>
-              <input type="number" min={0} value={form.costPrice} onChange={(e) => setForm({ ...form, costPrice: Number(e.target.value || 0) })} className="w-full border border-slate-300 rounded-xl px-3 py-2" />
+              <input
+                type="number"
+                min={0}
+                value={form.costPrice}
+                onChange={(e) => setForm({ ...form, costPrice: e.target.value })}
+                onBlur={() => setForm(prev => ({ ...prev, costPrice: prev.costPrice === "" ? "" : Number(prev.costPrice) }))}
+                className="w-full border border-slate-300 rounded-xl px-3 py-2"
+              />
             </div>
             <div>
               <label className="text-xs opacity-60">Selling Price</label>
-              <input type="number" min={0} value={form.sellingPrice} onChange={(e) => setForm({ ...form, sellingPrice: Number(e.target.value || 0) })} className="w-full border border-slate-300 rounded-xl px-3 py-2" />
+              <input
+                type="number"
+                min={0}
+                value={form.sellingPrice}
+                onChange={(e) => setForm({ ...form, sellingPrice: e.target.value })}
+                onBlur={() => setForm(prev => ({ ...prev, sellingPrice: prev.sellingPrice === "" ? "" : Number(prev.sellingPrice) }))}
+                className="w-full border border-slate-300 rounded-xl px-3 py-2"
+              />
             </div>
             <div>
               <label className="text-xs opacity-60">Stock</label>
-              <input type="number" min={0} value={form.stock} onChange={(e) => setForm({ ...form, stock: Number(e.target.value || 0) })} className="w-full border border-slate-300 rounded-xl px-3 py-2" />
+              <input
+                type="number"
+                min={0}
+                value={form.stock}
+                onChange={(e) => setForm({ ...form, stock: e.target.value })}
+                onBlur={() => setForm(prev => ({ ...prev, stock: prev.stock === "" ? "" : Number(prev.stock) }))}
+                className="w-full border border-slate-300 rounded-xl px-3 py-2"
+              />
             </div>
           </div>
           <div className="flex items-center gap-2 mt-3">
@@ -70,6 +99,10 @@ export function InventoryPage(): JSX.Element {
       <Card>
         <CardHeader title={`Inventory (${inventory.length})`} />
         <CardBody>
+          <div className="flex items-center justify-end text-sm mb-3">
+            <span className="opacity-60 mr-2">Total Potential Profit:</span>
+            <span className="font-semibold">{INR(totalPotential)}</span>
+          </div>
           {inventory.length === 0 ? (
             <div className="text-center py-10 opacity-60">No items</div>
           ) : (

@@ -12,6 +12,7 @@ export function AddSaleModal({ onClose }: { onClose: () => void }) {
   function onSelectItem(inv: InventoryItem | null) {
     if (!inv) return;
     setForm(prev => ({ ...prev, item: inv.name, sku: inv.sku, unitPrice: inv.sellingPrice }));
+    setNotice(null);
   }
   function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -26,6 +27,9 @@ export function AddSaleModal({ onClose }: { onClose: () => void }) {
     setState(prev => ({ ...prev, sales: [ { id: uid("S"), ...form, qty: Number(form.qty||0), unitPrice: Number(form.unitPrice||0) }, ...prev.sales ] }));
     onClose();
   }
+  const currentStock = (Array.isArray(state.inventory)?state.inventory:[]).find(i => i.sku === form.sku)?.stock ?? 0;
+  const outOfStock = !form.sku || currentStock === 0 || form.qty > currentStock;
+
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur flex items-center justify-center p-4 z-50">
       <div className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-2xl border border-slate-200 dark:border-slate-600 shadow-xl">
@@ -64,7 +68,28 @@ export function AddSaleModal({ onClose }: { onClose: () => void }) {
             </div>
             <div>
               <label className="text-xs opacity-60">Quantity *</label>
-              <input type="number" min={1} value={form.qty} onChange={(e: ChangeEvent<HTMLInputElement>) => setForm({ ...form, qty: Number(e.target.value || 0) })} className="w-full border border-slate-300 rounded-xl px-3 py-2" />
+              <input
+                type="number"
+                min={1}
+                max={(Array.isArray(state.inventory)?state.inventory:[]).find(i => i.sku === form.sku)?.stock ?? undefined}
+                value={form.qty}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  const invList = Array.isArray(state.inventory) ? state.inventory : [];
+                  const matched = invList.find(i => i.sku === form.sku);
+                  const next = Number(e.target.value || 0);
+                  if (matched && next > matched.stock) {
+                    setNotice("Requested quantity exceeds stock");
+                    setForm({ ...form, qty: matched.stock });
+                  } else {
+                    setNotice(null);
+                    setForm({ ...form, qty: next });
+                  }
+                }}
+                className="w-full border border-slate-300 rounded-xl px-3 py-2"
+              />
+              <div className="text-xs opacity-60 mt-1">
+                Stock: {(Array.isArray(state.inventory)?state.inventory:[]).find(i => i.sku === form.sku)?.stock ?? 0}
+              </div>
               {notice && <p className="text-xs text-red-600 mt-1">{notice}</p>}
             </div>
             <div>
@@ -73,7 +98,7 @@ export function AddSaleModal({ onClose }: { onClose: () => void }) {
               <p className="text-xs opacity-60 mt-1">Auto-fills from inventory</p>
             </div>
             <div className="md:col-span-3 flex items-center gap-3 pt-2">
-              <button className="px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700" type="submit">Save</button>
+              <button disabled={outOfStock} className="px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed" type="submit">Save</button>
               <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl border">Cancel</button>
             </div>
           </form>

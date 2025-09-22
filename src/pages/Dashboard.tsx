@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Card, CardBody, CardHeader } from "../components/Card";
 import { KpiCard } from "../components/KpiCard";
 import { startOfMonthISO, todayISO, fmtNum, INR } from "../lib/utils";
-import { CircleDollarSign, Receipt, Users, Target } from "lucide-react";
+import { CircleDollarSign, Receipt, Users, Target, PiggyBank } from "lucide-react";
 import { useStore } from "../context/Store";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from "recharts";
 
@@ -29,8 +29,9 @@ export function Dashboard(): JSX.Element {
       const rate = Number(ex?.incentivePct || 0) / 100;
       return sum + (s.qty * s.unitPrice * rate);
     }, 0);
-    return { revenue, items, bills, best, incentives };
-  }, [filteredSales, state.executives]);
+    const potentialProfit = state.inventory.reduce((sum, i) => sum + Math.max(0, (i.sellingPrice - i.costPrice) * i.stock), 0);
+    return { revenue, items, bills, best, incentives, potentialProfit };
+  }, [filteredSales, state.executives, state.inventory]);
 
   const salesByExecData = useMemo(() => {
     const map: Record<string, number> = {};
@@ -76,7 +77,8 @@ export function Dashboard(): JSX.Element {
         <KpiCard title="Items Sold" icon={Receipt} value={fmtNum(totals.items)} note="All products" />
         <KpiCard title="Best Executive" icon={Users} value={totals.best} note="Top performer (range)" />
         <TargetCard from={from} to={to} />
-        <KpiCard title="Incentives (month)" icon={CircleDollarSign} value={INR(totals.incentives)} note="At configured rates" />
+        <KpiCard title="Incentives (range)" icon={CircleDollarSign} value={INR(totals.incentives)} note="At configured rates" />
+        <KpiCard title="Potential Profit" icon={PiggyBank} value={INR(totals.potentialProfit)} note="If all stock sold" />
       </div>
 
       <div className="grid lg:grid-cols-2 gap-4">
@@ -126,8 +128,10 @@ export function Dashboard(): JSX.Element {
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={salesByItemData as any} dataKey="value" nameKey="name" label>
-                    {salesByItemData.map((_, i) => (<Cell key={i} />))}
+                  <Pie data={salesByItemData as any} dataKey="value" nameKey="name" labelLine={false} label>
+                    {salesByItemData.map((_, i) => (
+                      <Cell key={i} fill={["#A5B4FC","#FBCFE8","#C7D2FE","#FDE68A","#FCA5A5","#BFDBFE","#BBF7D0","#DDD6FE"][i % 8]} />
+                    ))}
                   </Pie>
                   <Tooltip formatter={(v: number) => INR(v)} />
                   <Legend />

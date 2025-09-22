@@ -5,21 +5,20 @@ import { useStore } from "../context/Store";
 import { AddSaleModal } from "../components/AddSaleModal";
 import { EditSaleModal } from "../components/EditSaleModal";
 import { Download, Pencil, Plus, Search, Trash2 } from "lucide-react";
-import { INR, fmtNum, startOfMonthISO, todayISO } from "../lib/utils";
+import { INR, fmtNum } from "../lib/utils";
 
 export function Sales(): JSX.Element {
   const { state, setState } = useStore();
   const [query, setQuery] = useState("");
   const [branch, setBranch] = useState("");
   const [execId, setExecId] = useState("");
-  const [from, setFrom] = useState(todayISO());
-  const [to, setTo] = useState(todayISO());
-  const [date, setDate] = useState(todayISO());
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
   const [showAdd, setShowAdd] = useState(false);
   const [editingSale, setEditingSale] = useState<null | (typeof state.sales[number])>(null);
 
   const rows = useMemo(() => state.sales
-    .filter((s) => (!branch || s.branchId === branch) && (!execId || s.execId === execId) && s.date >= from && s.date <= to)
+    .filter((s) => (!branch || s.branchId === branch) && (!execId || s.execId === execId) && (!from || s.date >= from) && (!to || s.date <= to))
     .filter((s) => {
       const q = query.trim().toLowerCase();
       if (!q) return true;
@@ -84,14 +83,15 @@ export function Sales(): JSX.Element {
                 {state.executives.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
               </select>
             </div>
-            <div>
-              <label className="block text-xs opacity-60">Date</label>
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => { setDate(e.target.value); setFrom(e.target.value); setTo(e.target.value); }}
-                className="w-full border border-slate-300 rounded-xl px-3 py-2"
-              />
+            <div className="flex items-end gap-2">
+              <div>
+                <label className="block text-xs opacity-60">From</label>
+                <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="border border-slate-300 rounded-xl px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-xs opacity-60">To</label>
+                <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="border border-slate-300 rounded-xl px-3 py-2" />
+              </div>
             </div>
           </div>
         </CardBody>

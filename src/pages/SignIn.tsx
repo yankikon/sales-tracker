@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Google } from "lucide-react";
 import { useAuth } from "../context/Auth";
 
 export function SignIn(): JSX.Element {
@@ -52,7 +51,7 @@ export function SignIn(): JSX.Element {
         </form>
         <div className="my-3 text-center text-xs opacity-60">or</div>
         <button onClick={handleGoogle} className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl border">
-          <Google className="w-4 h-4" /> Continue with Google
+          Continue with Google
         </button>
         <div className="mt-4 text-xs text-center">
           {mode === "signin" ? (

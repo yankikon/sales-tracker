@@ -165,7 +165,7 @@ function TargetCard({ from, to }: { from: string; to: string }) {
           <div className="p-2 rounded-xl bg-slate-100 border border-slate-200 dark:bg-slate-700 dark:border-slate-600"><Target className="w-5 h-5" /></div>
           <div className="flex-1">
             <p className="text-xs opacity-60">Team Target (month)</p>
-            <p className="text-xl font-semibold">{INR(thisMonth.totals)} / {INR(thisMonth.target)}</p>
+            <p className="text-lg font-semibold">{INR(thisMonth.totals)} / {INR(thisMonth.target)}</p>
             <div className="h-2 rounded-full overflow-hidden mt-2" style={{ backgroundColor: '#E2E8F0' }}>
               <div className="h-2" style={{ width: `${Math.min(100, thisMonth.pct)}%`, backgroundColor: thisMonth.pct >= 70 ? '#16A34A' : '#DC2626' }} />
             </div>

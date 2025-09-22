@@ -32,7 +32,7 @@ export function Sales(): JSX.Element {
       if (!q) return true;
       return s.billNo.toLowerCase().includes(q) || s.item.toLowerCase().includes(q) || s.sku.toLowerCase().includes(q);
     })
-    .sort((a, b) => (a.date < b.date ? 1 : -1)), [state.sales, branch, execId, from, to, query]);
+    .sort((a, b) => (a.date > b.date ? -1 : 1)), [state.sales, branch, execId, from, to, query]);
 
   const totalAmount = rows.reduce((acc, r) => acc + r.qty * r.unitPrice, 0);
   const totalQty = rows.reduce((acc, r) => acc + r.qty, 0);

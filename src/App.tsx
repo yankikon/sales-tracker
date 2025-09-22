@@ -37,7 +37,15 @@ export default function App(): JSX.Element {
       <div className={dark ? "min-h-screen bg-slate-900 text-slate-100" : "min-h-screen bg-slate-50 text-slate-900"}>
         <header className={dark ? "sticky top-0 z-20 bg-slate-800/80 backdrop-blur border-b border-slate-700" : "sticky top-0 z-20 bg-white/80 backdrop-blur border-b border-slate-200"}>
           <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
-            <Building2 className="w-6 h-6" />
+            {state.business.logo ? (
+              <img 
+                src={state.business.logo} 
+                alt="Business Logo" 
+                className="w-8 h-8 object-cover rounded-lg"
+              />
+            ) : (
+              <Building2 className="w-6 h-6" />
+            )}
             <div className="flex-1">
               <h1 className="text-lg font-semibold">{state.business.name || "Sales Executive Performance Tracker"}</h1>
               {state.business.address && <p className="text-xs opacity-70">{state.business.address}</p>}

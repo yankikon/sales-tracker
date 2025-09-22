@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { Card, CardBody, CardHeader } from "../components/Card";
 import { useStore } from "../context/Store";
+import { Upload, X } from "lucide-react";
 export function SettingsPage(): JSX.Element {
   const { state, setState } = useStore();
   const [biz, setBiz] = useState({ name: state.business.name, address: state.business.address });
   const [branch, setBranch] = useState({ name: "", city: "" });
+  const fileInputRef = useRef<HTMLInputElement>(null);
   function saveBiz(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setState(prev => ({ ...prev, business: { ...prev.business, ...biz } }));
@@ -23,12 +25,102 @@ export function SettingsPage(): JSX.Element {
     if (!confirm("Delete this branch?")) return;
     setState(prev => ({ ...prev, branches: prev.branches.filter(b => b.id !== id) }));
   }
+
+  function handleLogoUpload(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Please upload a valid image file (JPEG, PNG, or GIF)');
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    const maxSize = 2 * 1024 * 1024; // 2MB
+    if (file.size > maxSize) {
+      alert('File size must be less than 2MB');
+      return;
+    }
+
+    // Create image to check dimensions
+    const img = new Image();
+    img.onload = () => {
+      // Validate dimensions (max 200x200 for square logo)
+      if (img.width > 200 || img.height > 200) {
+        alert('Image dimensions must be 200x200 pixels or smaller');
+        return;
+      }
+
+      // Convert to base64
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = event.target?.result as string;
+        setState(prev => ({ 
+          ...prev, 
+          business: { ...prev.business, logo: base64 } 
+        }));
+      };
+      reader.readAsDataURL(file);
+    };
+    img.src = URL.createObjectURL(file);
+  }
+
+  function removeLogo() {
+    setState(prev => ({ 
+      ...prev, 
+      business: { ...prev.business, logo: undefined } 
+    }));
+  }
   return (
     <div className="grid lg:grid-cols-2 gap-6">
       <Card>
         <CardHeader title="Business Profile" />
         <CardBody>
           <form onSubmit={saveBiz} className="space-y-3">
+            <div>
+              <label className="text-xs opacity-60">Business Logo</label>
+              <div className="flex items-center gap-3">
+                {state.business.logo ? (
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src={state.business.logo} 
+                      alt="Business Logo" 
+                      className="w-16 h-16 object-cover rounded-lg border border-slate-300"
+                    />
+                    <button 
+                      type="button" 
+                      onClick={removeLogo}
+                      className="p-2 rounded-lg border hover:bg-slate-50 dark:hover:bg-slate-700"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <div className="w-16 h-16 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center">
+                      <Upload className="w-6 h-6 opacity-40" />
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="px-3 py-2 rounded-xl border hover:bg-slate-50 dark:hover:bg-slate-700"
+                    >
+                      Upload Logo
+                    </button>
+                  </div>
+                )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/gif"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                />
+              </div>
+              <p className="text-xs opacity-60 mt-1">Max 200x200px, 2MB, JPEG/PNG/GIF</p>
+            </div>
             <div>
               <label className="text-xs opacity-60">Business Name</label>
               <input value={biz.name} onChange={(e: ChangeEvent<HTMLInputElement>) => setBiz({ ...biz, name: e.target.value })} placeholder="Your company name" className="w-full border border-slate-300 rounded-xl px-3 py-2" />

@@ -1,5 +1,5 @@
 export type ID = string;
-export interface Business { name: string; address: string; }
+export interface Business { name: string; address: string; logo?: string; }
 export interface Branch { id: ID; name: string; city: string; }
 export interface Executive {
   id: ID; name: string; phone?: string; email?: string; territory?: string; branchId: ID; joinedOn: string; targetMonthly: number; incentivePct?: number;

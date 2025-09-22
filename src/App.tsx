@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from "react";
-import { Building2, Home, Settings, Users, Receipt, Moon, Sun } from "lucide-react";
+import { Building2, Home, Settings, Users, Receipt, Moon, Sun, Boxes } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Dashboard } from "./pages/Dashboard";
 import { Executives } from "./pages/Executives";
 import { Sales } from "./pages/Sales";
 import { SettingsPage } from "./pages/Settings";
 import { UnderPerfCard } from "./components/UnderPerfCard";
+import { InventoryPage } from "./pages/Inventory";
 import { useStore, ThemeCtx } from "./context/Store";
 import { useAuth } from "./context/Auth";
 import { SignIn } from "./pages/SignIn";
@@ -14,9 +15,10 @@ const NAV: Array<{ key: Route; label: string; icon: LucideIcon }> = [
   { key: "dashboard", label: "Dashboard", icon: Home },
   { key: "executives", label: "Executives", icon: Users },
   { key: "sales", label: "Sales", icon: Receipt },
+  { key: "inventory", label: "Inventory", icon: Boxes },
   { key: "settings", label: "Settings", icon: Settings },
 ];
-export type Route = "dashboard" | "executives" | "sales" | "settings";
+export type Route = "dashboard" | "executives" | "sales" | "inventory" | "settings";
 
 export default function App(): JSX.Element {
   const { state } = useStore();
@@ -70,6 +72,7 @@ export default function App(): JSX.Element {
             {route === "dashboard" && <Dashboard />}
             {route === "executives" && <Executives />}
             {route === "sales" && <Sales />}
+            {route === "inventory" && <InventoryPage />}
             {route === "settings" && <SettingsPage />}
           </section>
         </main>

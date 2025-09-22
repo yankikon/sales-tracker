@@ -1,14 +1,27 @@
 import React, { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { useStore } from "../context/Store";
+import type { InventoryItem } from "../lib/types";
 import { todayISO, uid } from "../lib/utils";
 import type { Sale } from "../lib/types";
 export function AddSaleModal({ onClose }: { onClose: () => void }) {
   const { state, setState } = useStore();
   const [form, setForm] = useState<Omit<Sale, "id">>({ billNo: "", date: todayISO(), execId: state.executives[0]?.id || "", branchId: state.branches[0]?.id || "", item: "", sku: "", qty: 1, unitPrice: 0 });
+  const [notice, setNotice] = useState<string | null>(null);
+
+  function onSelectItem(inv: InventoryItem | null) {
+    if (!inv) return;
+    setForm(prev => ({ ...prev, item: inv.name, sku: inv.sku, unitPrice: inv.sellingPrice }));
+  }
   function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!form.billNo.trim() || !form.item.trim() || !form.sku.trim() || !form.execId || !form.branchId) { alert("Missing required fields"); return; }
+    const matched = state.inventory.find(i => i.sku === form.sku);
+    if (matched) {
+      if (form.qty > matched.stock) { setNotice("Out of stock"); return; }
+      // deduct stock
+      setState(prev => ({ ...prev, inventory: prev.inventory.map(i => i.id === matched.id ? { ...i, stock: i.stock - form.qty } : i) }));
+    }
     setState(prev => ({ ...prev, sales: [ { id: uid("S"), ...form, qty: Number(form.qty||0), unitPrice: Number(form.unitPrice||0) }, ...prev.sales ] }));
     onClose();
   }
@@ -43,19 +56,20 @@ export function AddSaleModal({ onClose }: { onClose: () => void }) {
             </div>
             <div className="md:col-span-2">
               <label className="text-xs opacity-60">Item *</label>
-              <input value={form.item} onChange={(e: ChangeEvent<HTMLInputElement>) => setForm({ ...form, item: e.target.value })} placeholder="Product name" className="w-full border border-slate-300 rounded-xl px-3 py-2" />
-            </div>
-            <div>
-              <label className="text-xs opacity-60">SKU *</label>
-              <input value={form.sku} onChange={(e: ChangeEvent<HTMLInputElement>) => setForm({ ...form, sku: e.target.value })} placeholder="SKU code" className="w-full border border-slate-300 rounded-xl px-3 py-2" />
+              <select value={form.sku} onChange={(e: ChangeEvent<HTMLSelectElement>) => { const inv = state.inventory.find(i => i.sku === e.target.value) || null; setForm({ ...form, sku: e.target.value, item: inv?.name || "" }); onSelectItem(inv); }} className="w-full border border-slate-300 rounded-xl px-3 py-2">
+                <option value="">Select item</option>
+                {state.inventory.map(i => <option key={i.id} value={i.sku}>{i.name} ({i.sku})</option>)}
+              </select>
             </div>
             <div>
               <label className="text-xs opacity-60">Quantity *</label>
               <input type="number" min={1} value={form.qty} onChange={(e: ChangeEvent<HTMLInputElement>) => setForm({ ...form, qty: Number(e.target.value || 0) })} className="w-full border border-slate-300 rounded-xl px-3 py-2" />
+              {notice && <p className="text-xs text-red-600 mt-1">{notice}</p>}
             </div>
             <div>
               <label className="text-xs opacity-60">Unit Price (₹) *</label>
               <input type="number" min={0} value={form.unitPrice} onChange={(e: ChangeEvent<HTMLInputElement>) => setForm({ ...form, unitPrice: Number(e.target.value || 0) })} className="w-full border border-slate-300 rounded-xl px-3 py-2" />
+              <p className="text-xs opacity-60 mt-1">Auto-fills from inventory</p>
             </div>
             <div className="md:col-span-3 flex items-center gap-3 pt-2">
               <button className="px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700" type="submit">Save</button>

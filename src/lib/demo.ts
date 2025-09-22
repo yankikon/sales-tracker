@@ -16,6 +16,11 @@ export function demoState(): AppState {
       { id: uid("S"), billNo: "B1001", date: todayISO(), execId: "E001", branchId: "b_koh", item: "Thermal Printer", sku: "TP-200", qty: 3, unitPrice: 15000 },
       { id: uid("S"), billNo: "B1002", date: todayISO(), execId: "E002", branchId: "b_dim", item: "Label Roll", sku: "LR-58", qty: 20, unitPrice: 120 },
       { id: uid("S"), billNo: "B1003", date: todayISO(), execId: "E001", branchId: "b_koh", item: "Barcode Scanner", sku: "BS-900", qty: 2, unitPrice: 4500 }
+    ],
+    inventory: [
+      { id: uid("I"), name: "Thermal Printer", sku: "TP-200", costPrice: 12000, sellingPrice: 15000, stock: 10 },
+      { id: uid("I"), name: "Label Roll", sku: "LR-58", costPrice: 80, sellingPrice: 120, stock: 200 },
+      { id: uid("I"), name: "Barcode Scanner", sku: "BS-900", costPrice: 3500, sellingPrice: 4500, stock: 25 }
     ]
   };
 }

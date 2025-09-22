@@ -11,6 +11,7 @@ export function Sales(): JSX.Element {
   const { state, setState } = useStore();
   const [query, setQuery] = useState("");
   const [branch, setBranch] = useState("");
+  const [category, setCategory] = useState("");
   const [execId, setExecId] = useState("");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
@@ -18,7 +19,14 @@ export function Sales(): JSX.Element {
   const [editingSale, setEditingSale] = useState<null | (typeof state.sales[number])>(null);
 
   const rows = useMemo(() => state.sales
-    .filter((s) => (!branch || s.branchId === branch) && (!execId || s.execId === execId) && (!from || s.date >= from) && (!to || s.date <= to))
+    .filter((s) => {
+      const okBranch = !branch || s.branchId === branch;
+      const okExec = !execId || s.execId === execId;
+      const okDate = (!from || s.date >= from) && (!to || s.date <= to);
+      const inv = (Array.isArray(state.inventory)?state.inventory:[]).find(i => i.sku === s.sku);
+      const okCat = !category || (inv?.category === category);
+      return okBranch && okExec && okDate && okCat;
+    })
     .filter((s) => {
       const q = query.trim().toLowerCase();
       if (!q) return true;
@@ -84,6 +92,13 @@ export function Sales(): JSX.Element {
               </select>
             </div>
             <div>
+              <label className="text-xs opacity-60">Category</label>
+              <select value={category} onChange={(e: ChangeEvent<HTMLSelectElement>) => setCategory(e.target.value)} className="w-full border border-slate-300 rounded-xl px-3 py-2">
+                <option value="">All</option>
+                {(state.categories || []).map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
               <label className="block text-xs opacity-60">From</label>
               <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="w-full border border-slate-300 rounded-xl px-3 py-2" />
             </div>
@@ -110,6 +125,7 @@ export function Sales(): JSX.Element {
                     <th className="py-2 pr-3">Date</th>
                     <th className="py-2 pr-3">Item</th>
                     <th className="py-2 pr-3">SKU</th>
+                    <th className="py-2 pr-3">Category</th>
                     <th className="py-2 pr-3 text-right">Qty</th>
                     <th className="py-2 pr-3 text-right">Unit</th>
                     <th className="py-2 pr-3 text-right">Amount</th>
@@ -122,6 +138,7 @@ export function Sales(): JSX.Element {
                     const name = state.executives.find((e) => e.id === r.execId)?.name || r.execId;
                     const branchName = state.branches.find((b) => b.id === r.branchId)?.name || r.branchId;
                     const amount = r.qty * r.unitPrice;
+                    const cat = (Array.isArray(state.inventory)?state.inventory:[]).find(i => i.sku === r.sku)?.category || "—";
                     return (
                       <tr key={r.id} className="border-b last:border-b-0">
                         <td className="py-2 pr-3">{name}</td>
@@ -129,6 +146,7 @@ export function Sales(): JSX.Element {
                         <td className="py-2 pr-3">{r.date}</td>
                         <td className="py-2 pr-3">{r.item}</td>
                         <td className="py-2 pr-3">{r.sku}</td>
+                        <td className="py-2 pr-3">{cat}</td>
                         <td className="py-2 pr-3 text-right">{fmtNum(r.qty)}</td>
                         <td className="py-2 pr-3 text-right">{INR(r.unitPrice)}</td>
                         <td className="py-2 pr-3 text-right font-medium">{INR(amount)}</td>

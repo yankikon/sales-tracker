@@ -63,7 +63,7 @@ export function AddSaleModal({ onClose }: { onClose: () => void }) {
               <label className="text-xs opacity-60">Item *</label>
               <select value={form.sku} onChange={(e: ChangeEvent<HTMLSelectElement>) => { const list = Array.isArray(state.inventory)?state.inventory:[]; const inv = list.find(i => i.sku === e.target.value) || null; setForm({ ...form, sku: e.target.value, item: inv?.name || "" }); onSelectItem(inv); }} className="w-full border border-slate-300 rounded-xl px-3 py-2">
                 <option value="">Select item</option>
-                {(Array.isArray(state.inventory)?state.inventory:[]).map(i => <option key={i.id} value={i.sku}>{i.name} ({i.sku})</option>)}
+                {(Array.isArray(state.inventory)?state.inventory:[]).map(i => <option key={i.id} value={i.sku}>{i.name} ({i.sku}){i.category?` – ${i.category}`:""}</option>)}
               </select>
             </div>
             <div>

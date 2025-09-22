@@ -18,9 +18,10 @@ export function demoState(): AppState {
       { id: uid("S"), billNo: "B1003", date: todayISO(), execId: "E001", branchId: "b_koh", item: "Barcode Scanner", sku: "BS-900", qty: 2, unitPrice: 4500 }
     ],
     inventory: [
-      { id: uid("I"), name: "Thermal Printer", sku: "TP-200", costPrice: 12000, sellingPrice: 15000, stock: 10 },
-      { id: uid("I"), name: "Label Roll", sku: "LR-58", costPrice: 80, sellingPrice: 120, stock: 200 },
-      { id: uid("I"), name: "Barcode Scanner", sku: "BS-900", costPrice: 3500, sellingPrice: 4500, stock: 25 }
-    ]
+      { id: uid("I"), name: "Thermal Printer", sku: "TP-200", category: "Electronics", costPrice: 12000, sellingPrice: 15000, stock: 10 },
+      { id: uid("I"), name: "Label Roll", sku: "LR-58", category: "Accessories", costPrice: 80, sellingPrice: 120, stock: 200 },
+      { id: uid("I"), name: "Barcode Scanner", sku: "BS-900", category: "Electronics", costPrice: 3500, sellingPrice: 4500, stock: 25 }
+    ],
+    categories: ["Electronics", "Home", "Accessories", "Lights", "Furniture"]
   };
 }

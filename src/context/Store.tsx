@@ -15,6 +15,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       executives: Array.isArray(base.executives) ? base.executives : [],
       sales: Array.isArray(base.sales) ? base.sales : [],
       inventory: Array.isArray((base as any).inventory) ? (base as any).inventory : [],
+      categories: Array.isArray((base as any).categories) ? (base as any).categories : ["Electronics", "Home", "Accessories", "Lights", "Furniture"],
     };
   }
 

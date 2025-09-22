@@ -8,15 +8,16 @@ export function InventoryPage(): JSX.Element {
   const { state, setState } = useStore();
   const inventory = Array.isArray(state.inventory) ? state.inventory : [];
   const [editing, setEditing] = useState<null | InventoryItem>(null);
-  const [form, setForm] = useState<{ name: string; sku: string; costPrice: number | ""; sellingPrice: number | ""; stock: number | "" }>({ name: "", sku: "", costPrice: "", sellingPrice: "", stock: "" });
+  const [form, setForm] = useState<{ name: string; sku: string; category: string; costPrice: number | ""; sellingPrice: number | ""; stock: number | "" }>({ name: "", sku: "", category: state.categories?.[0] || "", costPrice: "", sellingPrice: "", stock: "" });
 
-  function reset() { setForm({ name: "", sku: "", costPrice: "", sellingPrice: "", stock: "" }); setEditing(null); }
+  function reset() { setForm({ name: "", sku: "", category: state.categories?.[0] || "", costPrice: "", sellingPrice: "", stock: "" }); setEditing(null); }
 
   function save() {
     if (!form.name.trim() || !form.sku.trim()) { alert("Missing fields"); return; }
     const normalized = {
       name: form.name,
       sku: form.sku,
+      category: form.category || undefined,
       costPrice: form.costPrice === "" ? 0 : Number(form.costPrice),
       sellingPrice: form.sellingPrice === "" ? 0 : Number(form.sellingPrice),
       stock: form.stock === "" ? 0 : Number(form.stock),
@@ -29,7 +30,7 @@ export function InventoryPage(): JSX.Element {
     reset();
   }
 
-  function edit(item: InventoryItem) { setEditing(item); setForm({ name: item.name, sku: item.sku, costPrice: String(item.costPrice) as unknown as number|"", sellingPrice: String(item.sellingPrice) as unknown as number|"", stock: String(item.stock) as unknown as number|"" }); }
+  function edit(item: InventoryItem) { setEditing(item); setForm({ name: item.name, sku: item.sku, category: item.category || (state.categories?.[0] || ""), costPrice: String(item.costPrice) as unknown as number|"", sellingPrice: String(item.sellingPrice) as unknown as number|"", stock: String(item.stock) as unknown as number|"" }); }
   function remove(id: string) { if (!confirm("Delete item?")) return; setState(prev => ({ ...prev, inventory: prev.inventory.filter(i => i.id !== id) })); }
 
   const profitInsights = useMemo(() => inventory.map(i => ({
@@ -54,6 +55,20 @@ export function InventoryPage(): JSX.Element {
             <div>
               <label className="text-xs opacity-60">SKU *</label>
               <input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} className="w-full border border-slate-300 rounded-xl px-3 py-2" />
+            </div>
+            <div>
+              <label className="text-xs opacity-60">Category</label>
+              <div className="flex gap-2">
+                <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full border border-slate-300 rounded-xl px-3 py-2">
+                  {(state.categories || []).map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <button type="button" onClick={() => {
+                  const name = prompt("Add new category name");
+                  if (!name) return;
+                  setState(prev => ({ ...prev, categories: Array.from(new Set([...(prev.categories || []), name])) }));
+                  setForm(prev => ({ ...prev, category: name }));
+                }} className="px-3 py-2 border rounded-xl">Add</button>
+              </div>
             </div>
             <div>
               <label className="text-xs opacity-60">Cost Price</label>
@@ -112,6 +127,7 @@ export function InventoryPage(): JSX.Element {
                   <tr className="text-left opacity-60 border-b">
                     <th className="py-2 pr-3">Item</th>
                     <th className="py-2 pr-3">SKU</th>
+                    <th className="py-2 pr-3">Category</th>
                     <th className="py-2 pr-3 text-right">Cost</th>
                     <th className="py-2 pr-3 text-right">Selling</th>
                     <th className="py-2 pr-3 text-right">Stock</th>
@@ -125,6 +141,7 @@ export function InventoryPage(): JSX.Element {
                     <tr key={r.id} className="border-b last:border-b-0">
                       <td className="py-2 pr-3">{r.name}</td>
                       <td className="py-2 pr-3">{r.sku}</td>
+                      <td className="py-2 pr-3">{(inventory.find(i=>i.id===r.id)?.category) || "—"}</td>
                       <td className="py-2 pr-3 text-right">{INR((inventory.find(i=>i.id===r.id)?.costPrice)||0)}</td>
                       <td className="py-2 pr-3 text-right">{INR((inventory.find(i=>i.id===r.id)?.sellingPrice)||0)}</td>
                       <td className="py-2 pr-3 text-right">{fmtNum((inventory.find(i=>i.id===r.id)?.stock)||0)}</td>

@@ -94,7 +94,7 @@ export function Dashboard(): JSX.Element {
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip formatter={(v: number) => INR(v)} />
-                  <Bar dataKey="value" />
+                  <Bar dataKey="value" fill="#A3DC9A" />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -113,7 +113,7 @@ export function Dashboard(): JSX.Element {
                   <XAxis dataKey="date" />
                   <YAxis />
                   <Tooltip formatter={(v: number) => INR(v)} />
-                  <Line type="monotone" dataKey="value" />
+                  <Line type="monotone" dataKey="value" stroke="#DEE791" />
                 </LineChart>
               </ResponsiveContainer>
             )}
@@ -130,7 +130,7 @@ export function Dashboard(): JSX.Element {
                 <PieChart>
                   <Pie data={salesByItemData as any} dataKey="value" nameKey="name" labelLine={false} label>
                     {salesByItemData.map((_, i) => (
-                      <Cell key={i} fill={["#A5B4FC","#FBCFE8","#C7D2FE","#FDE68A","#FCA5A5","#BFDBFE","#BBF7D0","#DDD6FE"][i % 8]} />
+                      <Cell key={i} fill={["#A3DC9A","#DEE791","#FFF9BD","#FFD6BA","#CDE8E5","#E1E5F2","#F7DAD9","#D3F8E2"][i % 8]} />
                     ))}
                   </Pie>
                   <Tooltip formatter={(v: number) => INR(v)} />

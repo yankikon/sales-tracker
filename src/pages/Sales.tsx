@@ -61,7 +61,7 @@ export function Sales(): JSX.Element {
           </div>
         } />
         <CardBody>
-          <div className="grid lg:grid-cols-5 gap-3">
+          <div className="grid lg:grid-cols-6 gap-3">
             <div className="lg:col-span-2">
               <label className="text-xs opacity-60">Search</label>
               <div className="relative">
@@ -83,15 +83,13 @@ export function Sales(): JSX.Element {
                 {state.executives.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
               </select>
             </div>
-            <div className="flex items-end gap-2">
-              <div>
-                <label className="block text-xs opacity-60">From</label>
-                <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="border border-slate-300 rounded-xl px-3 py-2" />
-              </div>
-              <div>
-                <label className="block text-xs opacity-60">To</label>
-                <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="border border-slate-300 rounded-xl px-3 py-2" />
-              </div>
+            <div>
+              <label className="block text-xs opacity-60">From</label>
+              <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="w-full border border-slate-300 rounded-xl px-3 py-2" />
+            </div>
+            <div>
+              <label className="block text-xs opacity-60">To</label>
+              <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-full border border-slate-300 rounded-xl px-3 py-2" />
             </div>
           </div>
         </CardBody>

@@ -12,8 +12,9 @@ export function Sales(): JSX.Element {
   const [query, setQuery] = useState("");
   const [branch, setBranch] = useState("");
   const [execId, setExecId] = useState("");
-  const [from, setFrom] = useState(startOfMonthISO());
+  const [from, setFrom] = useState(todayISO());
   const [to, setTo] = useState(todayISO());
+  const [date, setDate] = useState(todayISO());
   const [showAdd, setShowAdd] = useState(false);
   const [editingSale, setEditingSale] = useState<null | (typeof state.sales[number])>(null);
 
@@ -83,15 +84,14 @@ export function Sales(): JSX.Element {
                 {state.executives.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
               </select>
             </div>
-            <div className="flex items-end gap-2">
-              <div>
-                <label className="block text-xs opacity-60">From</label>
-                <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="border border-slate-300 rounded-xl px-3 py-2" />
-              </div>
-              <div>
-                <label className="block text-xs opacity-60">To</label>
-                <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="border border-slate-300 rounded-xl px-3 py-2" />
-              </div>
+            <div>
+              <label className="block text-xs opacity-60">Date</label>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => { setDate(e.target.value); setFrom(e.target.value); setTo(e.target.value); }}
+                className="w-full border border-slate-300 rounded-xl px-3 py-2"
+              />
             </div>
           </div>
         </CardBody>

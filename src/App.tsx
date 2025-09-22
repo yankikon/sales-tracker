@@ -7,6 +7,8 @@ import { Sales } from "./pages/Sales";
 import { SettingsPage } from "./pages/Settings";
 import { UnderPerfCard } from "./components/UnderPerfCard";
 import { useStore, ThemeCtx } from "./context/Store";
+import { useAuth } from "./context/Auth";
+import { SignIn } from "./pages/SignIn";
 
 const NAV: Array<{ key: Route; label: string; icon: LucideIcon }> = [
   { key: "dashboard", label: "Dashboard", icon: Home },
@@ -18,10 +20,15 @@ export type Route = "dashboard" | "executives" | "sales" | "settings";
 
 export default function App(): JSX.Element {
   const { state } = useStore();
+  const { user, signOutUser, loading } = useAuth();
   const [route, setRoute] = useState<Route>("dashboard");
   const [dark, setDark] = useState(false);
   const theme = dark ? "dark" : "light";
   const ctxTheme = useMemo(() => theme, [theme]);
+
+  if (!user && !loading) {
+    return <SignIn />;
+  }
 
   return (
     <ThemeCtx.Provider value={ctxTheme}>
@@ -33,6 +40,12 @@ export default function App(): JSX.Element {
               <h1 className="text-lg font-semibold">{state.business.name || "Sales Executive Performance Tracker"}</h1>
               {state.business.address && <p className="text-xs opacity-70">{state.business.address}</p>}
             </div>
+            {user && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs opacity-70 truncate max-w-[140px]">{user.email || user.displayName || "Signed in"}</span>
+                <button onClick={signOutUser} className="inline-flex items-center gap-2 text-xs border rounded-xl px-2 py-1">Sign out</button>
+              </div>
+            )}
             <button onClick={() => setDark(!dark)} className="inline-flex items-center gap-2 text-xs border rounded-xl px-2 py-1">
               {dark ? <Sun className="w-4 h-4"/> : <Moon className="w-4 h-4"/>}
               {dark ? "Light" : "Dark"} Mode

@@ -55,18 +55,18 @@ export function Dashboard(): JSX.Element {
   }, [filteredSales]);
 
   return (
-    <div className="space-y-6">
-      <Card>
+    <div className="space-y-6" style={{ backgroundColor: '#F5F7FA' }}>
+      <Card style={{ backgroundColor: '#FFFFFF' }}>
         <CardHeader title="Filters" />
         <CardBody>
           <div className="flex flex-wrap items-end gap-3">
             <div>
-              <label className="block text-xs opacity-60">From</label>
-              <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="border border-slate-300 rounded-xl px-3 py-2" />
+              <label className="block text-xs" style={{ color: '#475569' }}>From</label>
+              <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="border rounded-xl px-3 py-2" style={{ borderColor: '#E2E8F0' }} />
             </div>
             <div>
-              <label className="block text-xs opacity-60">To</label>
-              <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="border border-slate-300 rounded-xl px-3 py-2" />
+              <label className="block text-xs" style={{ color: '#475569' }}>To</label>
+              <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="border rounded-xl px-3 py-2" style={{ borderColor: '#E2E8F0' }} />
             </div>
           </div>
         </CardBody>
@@ -94,7 +94,7 @@ export function Dashboard(): JSX.Element {
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip formatter={(v: number) => INR(v)} />
-                  <Bar dataKey="value" fill="#A3DC9A" />
+                  <Bar dataKey="value" fill="#4CAF50" />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -113,7 +113,7 @@ export function Dashboard(): JSX.Element {
                   <XAxis dataKey="date" />
                   <YAxis />
                   <Tooltip formatter={(v: number) => INR(v)} />
-                  <Line type="monotone" dataKey="value" stroke="#DEE791" />
+                  <Line type="monotone" dataKey="value" stroke="#2196F3" />
                 </LineChart>
               </ResponsiveContainer>
             )}
@@ -128,9 +128,9 @@ export function Dashboard(): JSX.Element {
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={salesByItemData as any} dataKey="value" nameKey="name" labelLine={false} label>
+                  <Pie data={salesByItemData as any} dataKey="value" nameKey="name" labelLine={false} label={false}>
                     {salesByItemData.map((_, i) => (
-                      <Cell key={i} fill={["#A3DC9A","#DEE791","#FFF9BD","#FFD6BA","#CDE8E5","#E1E5F2","#F7DAD9","#D3F8E2"][i % 8]} />
+                      <Cell key={i} fill={["#4CAF50","#2196F3","#FFB300","#FF7043","#26C6DA","#7E57C2","#9C27B0","#795548"][i % 8]} />
                     ))}
                   </Pie>
                   <Tooltip formatter={(v: number) => INR(v)} />
@@ -166,8 +166,8 @@ function TargetCard({ from, to }: { from: string; to: string }) {
           <div className="flex-1">
             <p className="text-xs opacity-60">Team Target (month)</p>
             <p className="text-xl font-semibold">{INR(thisMonth.totals)} / {INR(thisMonth.target)}</p>
-            <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden mt-2">
-              <div className="h-2 bg-emerald-500" style={{ width: `${Math.min(100, thisMonth.pct)}%` }} />
+            <div className="h-2 rounded-full overflow-hidden mt-2" style={{ backgroundColor: '#E2E8F0' }}>
+              <div className="h-2" style={{ width: `${Math.min(100, thisMonth.pct)}%`, backgroundColor: thisMonth.pct >= 70 ? '#16A34A' : '#DC2626' }} />
             </div>
             <p className="text-xs opacity-60 mt-1">{thisMonth.pct}% achieved</p>
           </div>

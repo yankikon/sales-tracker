@@ -47,7 +47,7 @@ export function InventoryPage(): JSX.Element {
       <Card>
         <CardHeader title={editing ? "Edit Item" : "Add Item"} />
         <CardBody>
-          <div className="grid md:grid-cols-5 gap-3">
+          <div className="grid md:grid-cols-4 gap-3">
             <div className="md:col-span-2">
               <label className="text-xs opacity-60">Item name *</label>
               <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full border border-slate-300 rounded-xl px-3 py-2" />
@@ -71,17 +71,6 @@ export function InventoryPage(): JSX.Element {
               </div>
             </div>
             <div>
-              <label className="text-xs opacity-60">Cost Price</label>
-              <input
-                type="number"
-                min={0}
-                value={form.costPrice}
-                onChange={(e) => setForm({ ...form, costPrice: e.target.value })}
-                onBlur={() => setForm(prev => ({ ...prev, costPrice: prev.costPrice === "" ? "" : Number(prev.costPrice) }))}
-                className="w-full border border-slate-300 rounded-xl px-3 py-2"
-              />
-            </div>
-            <div>
               <label className="text-xs opacity-60">Selling Price</label>
               <input
                 type="number"
@@ -100,6 +89,17 @@ export function InventoryPage(): JSX.Element {
                 value={form.stock}
                 onChange={(e) => setForm({ ...form, stock: e.target.value })}
                 onBlur={() => setForm(prev => ({ ...prev, stock: prev.stock === "" ? "" : Number(prev.stock) }))}
+                className="w-full border border-slate-300 rounded-xl px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="text-xs opacity-60">Cost Price</label>
+              <input
+                type="number"
+                min={0}
+                value={form.costPrice}
+                onChange={(e) => setForm({ ...form, costPrice: e.target.value })}
+                onBlur={() => setForm(prev => ({ ...prev, costPrice: prev.costPrice === "" ? "" : Number(prev.costPrice) }))}
                 className="w-full border border-slate-300 rounded-xl px-3 py-2"
               />
             </div>

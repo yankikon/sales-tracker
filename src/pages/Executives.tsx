@@ -5,14 +5,15 @@ import { useStore } from "../context/Store";
 import { BranchBadge } from "../components/BranchBadge";
 import { INR, startOfMonthISO, todayISO, genExecId, classNames } from "../lib/utils";
 import { Mail, Phone, Plus, Pencil, Trash2 } from "lucide-react";
+type ExecForm = { id: string; name: string; phone: string; email: string; territory: string; branchId: string; joinedOn: string; targetMonthly: number; incentivePct: number | "" };
 export function Executives(): JSX.Element {
   const { state, setState } = useStore();
-  const [form, setForm] = useState({ id: "", name: "", phone: "", email: "", territory: "", branchId: state.branches[0]?.id || "", joinedOn: todayISO(), targetMonthly: 0, incentivePct: 0 });
+  const [form, setForm] = useState<ExecForm>({ id: "", name: "", phone: "", email: "", territory: "", branchId: state.branches[0]?.id || "", joinedOn: todayISO(), targetMonthly: 0, incentivePct: "" });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
 
   function reset() {
-    setForm({ id: "", name: "", phone: "", email: "", territory: "", branchId: state.branches[0]?.id || "", joinedOn: todayISO(), targetMonthly: 0, incentivePct: 0 });
+    setForm({ id: "", name: "", phone: "", email: "", territory: "", branchId: state.branches[0]?.id || "", joinedOn: todayISO(), targetMonthly: 0, incentivePct: "" });
     setEditingId(null);
     setShowForm(false);
   }
@@ -20,17 +21,19 @@ export function Executives(): JSX.Element {
     e.preventDefault();
     if (!form.name.trim()) return alert("Name is required");
     if (!form.branchId) return alert("Branch is required");
+    const normalized = { ...form, incentivePct: form.incentivePct === "" ? 0 : Number(form.incentivePct) } as Omit<typeof form, "incentivePct"> & { incentivePct: number };
     if (editingId) {
-      setState(prev => ({ ...prev, executives: prev.executives.map(x => x.id === editingId ? { ...x, ...form, id: editingId } : x) }));
+      setState(prev => ({ ...prev, executives: prev.executives.map(x => x.id === editingId ? { ...x, ...normalized, id: editingId } : x) }));
     } else {
       const newId = form.id?.trim() || genExecId(state.executives);
-      setState(prev => ({ ...prev, executives: [...prev.executives, { ...form, id: newId }] }));
+      setState(prev => ({ ...prev, executives: [...prev.executives, { ...normalized, id: newId }] }));
     }
     reset();
   }
   function editExec(id: string) {
     const ex = state.executives.find(x => x.id === id); if (!ex) return;
-    setForm({ ...ex } as any); setEditingId(id); setShowForm(true);
+    setForm({ ...ex, incentivePct: (ex.incentivePct ?? 0).toString() as unknown as number | "" } as ExecForm);
+    setEditingId(id); setShowForm(true);
   }
   function deleteExec(id: string) {
     const hasSales = state.sales.some(s => s.execId === id);
@@ -85,7 +88,15 @@ export function Executives(): JSX.Element {
               </div>
               <div>
                 <label className="text-xs opacity-60">Incentive Rate (%)</label>
-                <input type="number" min={0} step={0.1} value={Number(form.incentivePct || 0)} onChange={(e: ChangeEvent<HTMLInputElement>) => setForm({ ...form, incentivePct: Number(e.target.value || 0) })} className="w-full border border-slate-300 rounded-xl px-3 py-2" />
+                <input
+                  type="number"
+                  min={0}
+                  step={0.1}
+                  value={form.incentivePct}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setForm({ ...form, incentivePct: e.target.value as unknown as number | "" })}
+                  onBlur={() => setForm(prev => ({ ...prev, incentivePct: prev.incentivePct === "" ? "" : Number(prev.incentivePct) }))}
+                  className="w-full border border-slate-300 rounded-xl px-3 py-2"
+                />
               </div>
               <div className="md:col-span-3 flex items-center gap-3 pt-2">
                 <button className="px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700" type="submit">{editingId ? "Save Changes" : "Add Executive"}</button>

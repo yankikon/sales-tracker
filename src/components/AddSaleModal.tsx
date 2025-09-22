@@ -16,7 +16,8 @@ export function AddSaleModal({ onClose }: { onClose: () => void }) {
   function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!form.billNo.trim() || !form.item.trim() || !form.sku.trim() || !form.execId || !form.branchId) { alert("Missing required fields"); return; }
-    const matched = state.inventory.find(i => i.sku === form.sku);
+    const invList = Array.isArray(state.inventory) ? state.inventory : [];
+    const matched = invList.find(i => i.sku === form.sku);
     if (matched) {
       if (form.qty > matched.stock) { setNotice("Out of stock"); return; }
       // deduct stock
@@ -56,9 +57,9 @@ export function AddSaleModal({ onClose }: { onClose: () => void }) {
             </div>
             <div className="md:col-span-2">
               <label className="text-xs opacity-60">Item *</label>
-              <select value={form.sku} onChange={(e: ChangeEvent<HTMLSelectElement>) => { const inv = state.inventory.find(i => i.sku === e.target.value) || null; setForm({ ...form, sku: e.target.value, item: inv?.name || "" }); onSelectItem(inv); }} className="w-full border border-slate-300 rounded-xl px-3 py-2">
+              <select value={form.sku} onChange={(e: ChangeEvent<HTMLSelectElement>) => { const list = Array.isArray(state.inventory)?state.inventory:[]; const inv = list.find(i => i.sku === e.target.value) || null; setForm({ ...form, sku: e.target.value, item: inv?.name || "" }); onSelectItem(inv); }} className="w-full border border-slate-300 rounded-xl px-3 py-2">
                 <option value="">Select item</option>
-                {state.inventory.map(i => <option key={i.id} value={i.sku}>{i.name} ({i.sku})</option>)}
+                {(Array.isArray(state.inventory)?state.inventory:[]).map(i => <option key={i.id} value={i.sku}>{i.name} ({i.sku})</option>)}
               </select>
             </div>
             <div>

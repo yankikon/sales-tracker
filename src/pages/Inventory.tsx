@@ -6,6 +6,7 @@ import { INR, fmtNum, uid } from "../lib/utils";
 
 export function InventoryPage(): JSX.Element {
   const { state, setState } = useStore();
+  const inventory = Array.isArray(state.inventory) ? state.inventory : [];
   const [editing, setEditing] = useState<null | InventoryItem>(null);
   const [form, setForm] = useState<Omit<InventoryItem, "id">>({ name: "", sku: "", costPrice: 0, sellingPrice: 0, stock: 0 });
 
@@ -14,9 +15,9 @@ export function InventoryPage(): JSX.Element {
   function save() {
     if (!form.name.trim() || !form.sku.trim()) { alert("Missing fields"); return; }
     if (editing) {
-      setState(prev => ({ ...prev, inventory: prev.inventory.map(i => i.id === editing.id ? { ...editing, ...form } : i) }));
+      setState(prev => ({ ...prev, inventory: (Array.isArray(prev.inventory)?prev.inventory:[]).map(i => i.id === editing.id ? { ...editing, ...form } : i) }));
     } else {
-      setState(prev => ({ ...prev, inventory: [{ id: uid("I"), ...form }, ...prev.inventory] }));
+      setState(prev => ({ ...prev, inventory: [{ id: uid("I"), ...form }, ...(Array.isArray(prev.inventory)?prev.inventory:[])] }));
     }
     reset();
   }
@@ -24,13 +25,13 @@ export function InventoryPage(): JSX.Element {
   function edit(item: InventoryItem) { setEditing(item); setForm({ name: item.name, sku: item.sku, costPrice: item.costPrice, sellingPrice: item.sellingPrice, stock: item.stock }); }
   function remove(id: string) { if (!confirm("Delete item?")) return; setState(prev => ({ ...prev, inventory: prev.inventory.filter(i => i.id !== id) })); }
 
-  const profitInsights = useMemo(() => state.inventory.map(i => ({
+  const profitInsights = useMemo(() => inventory.map(i => ({
     id: i.id,
     name: i.name,
     sku: i.sku,
     marginPerUnit: Math.max(0, i.sellingPrice - i.costPrice),
     potentialProfit: Math.max(0, (i.sellingPrice - i.costPrice) * i.stock)
-  })), [state.inventory]);
+  })), [inventory]);
 
   return (
     <div className="space-y-4">
@@ -67,9 +68,9 @@ export function InventoryPage(): JSX.Element {
       </Card>
 
       <Card>
-        <CardHeader title={`Inventory (${state.inventory.length})`} />
+        <CardHeader title={`Inventory (${inventory.length})`} />
         <CardBody>
-          {state.inventory.length === 0 ? (
+          {inventory.length === 0 ? (
             <div className="text-center py-10 opacity-60">No items</div>
           ) : (
             <div className="overflow-auto">
@@ -91,14 +92,14 @@ export function InventoryPage(): JSX.Element {
                     <tr key={r.id} className="border-b last:border-b-0">
                       <td className="py-2 pr-3">{r.name}</td>
                       <td className="py-2 pr-3">{r.sku}</td>
-                      <td className="py-2 pr-3 text-right">{INR(state.inventory.find(i=>i.id===r.id)!.costPrice)}</td>
-                      <td className="py-2 pr-3 text-right">{INR(state.inventory.find(i=>i.id===r.id)!.sellingPrice)}</td>
-                      <td className="py-2 pr-3 text-right">{fmtNum(state.inventory.find(i=>i.id===r.id)!.stock)}</td>
+                      <td className="py-2 pr-3 text-right">{INR((inventory.find(i=>i.id===r.id)?.costPrice)||0)}</td>
+                      <td className="py-2 pr-3 text-right">{INR((inventory.find(i=>i.id===r.id)?.sellingPrice)||0)}</td>
+                      <td className="py-2 pr-3 text-right">{fmtNum((inventory.find(i=>i.id===r.id)?.stock)||0)}</td>
                       <td className="py-2 pr-3 text-right">{INR(r.marginPerUnit)}</td>
                       <td className="py-2 pr-3 text-right font-medium">{INR(r.potentialProfit)}</td>
                       <td className="py-2 pr-3">
                         <div className="flex items-center gap-2">
-                          <button onClick={() => edit(state.inventory.find(i=>i.id===r.id)!)} className="p-2 rounded-lg border">Edit</button>
+                          <button onClick={() => { const item = inventory.find(i=>i.id===r.id); if (item) edit(item); }} className="p-2 rounded-lg border">Edit</button>
                           <button onClick={() => remove(r.id)} className="p-2 rounded-lg border">Delete</button>
                         </div>
                       </td>

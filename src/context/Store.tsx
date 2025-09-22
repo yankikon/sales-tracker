@@ -7,10 +7,21 @@ export const ThemeCtx = createContext<"light" | "dark">("light");
 const StoreCtx = createContext<{ state: AppState; setState: React.Dispatch<React.SetStateAction<AppState>> } | null>(null);
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
+  function normalizeState(raw: unknown): AppState {
+    const base = (raw as AppState) || ({} as AppState);
+    return {
+      business: base.business || { name: "", address: "" },
+      branches: Array.isArray(base.branches) ? base.branches : [],
+      executives: Array.isArray(base.executives) ? base.executives : [],
+      sales: Array.isArray(base.sales) ? base.sales : [],
+      inventory: Array.isArray((base as any).inventory) ? (base as any).inventory : [],
+    };
+  }
+
   const [state, setState] = useState<AppState>(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? (JSON.parse(raw) as AppState) : demoState();
+      return raw ? normalizeState(JSON.parse(raw)) : demoState();
     } catch {
       return demoState();
     }

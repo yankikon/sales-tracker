@@ -3,14 +3,15 @@ import type { ChangeEvent, FormEvent } from "react";
 import { Card, CardBody, CardHeader } from "../components/Card";
 import { useStore } from "../context/Store";
 import { BranchBadge } from "../components/BranchBadge";
-import { INR, startOfMonthISO, todayISO, genExecId, classNames } from "../lib/utils";
-import { Mail, Phone, Plus, Pencil, Trash2 } from "lucide-react";
+import { INR, startOfMonthISO, todayISO, genExecId, classNames, fmtNum } from "../lib/utils";
+import { Mail, Phone, Plus, Pencil, Trash2, X, Receipt } from "lucide-react";
 type ExecForm = { id: string; name: string; phone: string; email: string; territory: string; branchId: string; joinedOn: string; targetMonthly: number; incentivePct: number | "" };
 export function Executives(): JSX.Element {
   const { state, setState } = useStore();
   const [form, setForm] = useState<ExecForm>({ id: "", name: "", phone: "", email: "", territory: "", branchId: state.branches[0]?.id || "", joinedOn: todayISO(), targetMonthly: 0, incentivePct: "" });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [selectedExecSales, setSelectedExecSales] = useState<typeof state.sales[0] | null>(null);
 
   function reset() {
     setForm({ id: "", name: "", phone: "", email: "", territory: "", branchId: state.branches[0]?.id || "", joinedOn: todayISO(), targetMonthly: 0, incentivePct: "" });
@@ -40,6 +41,12 @@ export function Executives(): JSX.Element {
     if (hasSales) { alert("Cannot delete – this executive has sales records."); return; }
     if (!confirm("Delete this executive?")) return;
     setState(prev => ({ ...prev, executives: prev.executives.filter(x => x.id !== id) }));
+  }
+
+  function showExecSales(execId: string) {
+    const exec = state.executives.find(e => e.id === execId);
+    if (!exec) return;
+    setSelectedExecSales(exec);
   }
 
   const monthStart = startOfMonthISO();
@@ -138,7 +145,7 @@ export function Executives(): JSX.Element {
                       <tr key={e.id} className="border-b last:border-b-0">
                         <td className="py-2 pr-3 font-medium">{e.id}</td>
                         <td className="py-2 pr-3">
-                          <div className="font-medium">{e.name}</div>
+                          <div className="font-medium cursor-pointer hover:text-emerald-600" onClick={() => showExecSales(e.id)}>{e.name}</div>
                           <div className="text-xs opacity-60">{e.territory || "—"}</div>
                         </td>
                         <td className="py-2 pr-3 text-xs">
@@ -174,6 +181,88 @@ export function Executives(): JSX.Element {
           )}
         </CardBody>
       </Card>
+
+      {selectedExecSales && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-4xl border border-slate-200 dark:border-slate-600 shadow-xl">
+            <div className="px-4 py-3 border-b dark:border-slate-600 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Receipt className="w-5 h-5" />
+                <h3 className="font-semibold">{selectedExecSales.name} - Sales Records</h3>
+              </div>
+              <button onClick={() => setSelectedExecSales(null)} className="px-3 py-1.5 rounded-xl border">Close</button>
+            </div>
+            <div className="p-4">
+              {(() => {
+                const execSales = state.sales.filter(s => s.execId === selectedExecSales.id);
+                const totalAmount = execSales.reduce((acc, s) => acc + s.qty * s.unitPrice, 0);
+                const totalQty = execSales.reduce((acc, s) => acc + s.qty, 0);
+                
+                return (
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-3 gap-4 p-4 bg-slate-50 dark:bg-slate-700 rounded-xl">
+                      <div>
+                        <div className="text-xs opacity-60">Total Sales</div>
+                        <div className="text-lg font-semibold">{INR(totalAmount)}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs opacity-60">Total Items</div>
+                        <div className="text-lg font-semibold">{fmtNum(totalQty)}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs opacity-60">Total Bills</div>
+                        <div className="text-lg font-semibold">{execSales.length}</div>
+                      </div>
+                    </div>
+                    
+                    {execSales.length === 0 ? (
+                      <div className="text-center py-10 opacity-60">No sales records found</div>
+                    ) : (
+                      <div className="overflow-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="text-left opacity-60 border-b">
+                              <th className="py-2 pr-3">Bill No</th>
+                              <th className="py-2 pr-3">Date</th>
+                              <th className="py-2 pr-3">Item</th>
+                              <th className="py-2 pr-3">SKU</th>
+                              <th className="py-2 pr-3">Category</th>
+                              <th className="py-2 pr-3 text-right">Qty</th>
+                              <th className="py-2 pr-3 text-right">Unit Price</th>
+                              <th className="py-2 pr-3 text-right">Amount</th>
+                              <th className="py-2 pr-3">Branch</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {execSales.map((sale) => {
+                              const branchName = state.branches.find(b => b.id === sale.branchId)?.name || sale.branchId;
+                              const itemCategory = state.inventory.find(item => item.name === sale.item && item.sku === sale.sku)?.category || "—";
+                              const amount = sale.qty * sale.unitPrice;
+                              return (
+                                <tr key={sale.id} className="border-b last:border-b-0">
+                                  <td className="py-2 pr-3 font-medium">{sale.billNo}</td>
+                                  <td className="py-2 pr-3">{sale.date}</td>
+                                  <td className="py-2 pr-3">{sale.item}</td>
+                                  <td className="py-2 pr-3">{sale.sku}</td>
+                                  <td className="py-2 pr-3">{itemCategory}</td>
+                                  <td className="py-2 pr-3 text-right">{fmtNum(sale.qty)}</td>
+                                  <td className="py-2 pr-3 text-right">{INR(sale.unitPrice)}</td>
+                                  <td className="py-2 pr-3 text-right font-medium">{INR(amount)}</td>
+                                  <td className="py-2 pr-3">{branchName}</td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

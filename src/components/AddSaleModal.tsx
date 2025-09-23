@@ -7,6 +7,7 @@ import type { Sale } from "../lib/types";
 export function AddSaleModal({ onClose }: { onClose: () => void }) {
   const { state, setState } = useStore();
   const [form, setForm] = useState<Omit<Sale, "id">>({ billNo: "", date: todayISO(), execId: state.executives[0]?.id || "", branchId: state.branches[0]?.id || "", item: "", sku: "", qty: 1, unitPrice: 0 });
+  const [qtyInput, setQtyInput] = useState<string>("1");
   const [notice, setNotice] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
 
@@ -37,6 +38,50 @@ export function AddSaleModal({ onClose }: { onClose: () => void }) {
     const category = e.target.value;
     setSelectedCategory(category);
     setForm(prev => ({ ...prev, item: "", sku: "", unitPrice: 0 })); // Reset item when category changes
+  }
+
+  function handleQtyChange(e: ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value;
+    setQtyInput(value);
+    
+    if (value === "") {
+      setForm(prev => ({ ...prev, qty: 0 }));
+      setNotice(null);
+      return;
+    }
+    
+    const numValue = Number(value);
+    if (isNaN(numValue) || numValue < 1) {
+      setForm(prev => ({ ...prev, qty: 0 }));
+      setNotice("Quantity must be at least 1");
+      return;
+    }
+    
+    const matched = filteredInventory.find(i => i.sku === form.sku);
+    if (matched && numValue > matched.stock) {
+      setNotice("Requested quantity exceeds stock");
+      setForm(prev => ({ ...prev, qty: matched.stock }));
+      setQtyInput(String(matched.stock));
+    } else {
+      setNotice(null);
+      setForm(prev => ({ ...prev, qty: numValue }));
+    }
+  }
+
+  function handleQtyBlur() {
+    if (qtyInput === "") {
+      setQtyInput("1");
+      setForm(prev => ({ ...prev, qty: 1 }));
+    } else {
+      const numValue = Number(qtyInput);
+      if (isNaN(numValue) || numValue < 1) {
+        setQtyInput("1");
+        setForm(prev => ({ ...prev, qty: 1 }));
+      } else {
+        setQtyInput(String(numValue));
+        setForm(prev => ({ ...prev, qty: numValue }));
+      }
+    }
   }
   function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -105,18 +150,9 @@ export function AddSaleModal({ onClose }: { onClose: () => void }) {
                 type="number"
                 min={1}
                 max={filteredInventory.find(i => i.sku === form.sku)?.stock ?? undefined}
-                value={form.qty}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  const matched = filteredInventory.find(i => i.sku === form.sku);
-                  const next = Number(e.target.value || 0);
-                  if (matched && next > matched.stock) {
-                    setNotice("Requested quantity exceeds stock");
-                    setForm({ ...form, qty: matched.stock });
-                  } else {
-                    setNotice(null);
-                    setForm({ ...form, qty: next });
-                  }
-                }}
+                value={qtyInput}
+                onChange={handleQtyChange}
+                onBlur={handleQtyBlur}
                 className="w-full border border-slate-300 rounded-xl px-3 py-2"
               />
               <div className="text-xs opacity-60 mt-1">

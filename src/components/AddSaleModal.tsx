@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { useStore } from "../context/Store";
 import type { InventoryItem } from "../lib/types";
@@ -8,11 +8,35 @@ export function AddSaleModal({ onClose }: { onClose: () => void }) {
   const { state, setState } = useStore();
   const [form, setForm] = useState<Omit<Sale, "id">>({ billNo: "", date: todayISO(), execId: state.executives[0]?.id || "", branchId: state.branches[0]?.id || "", item: "", sku: "", qty: 1, unitPrice: 0 });
   const [notice, setNotice] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+
+  // Filter executives by selected branch
+  const filteredExecutives = useMemo(() => {
+    if (!form.branchId) return state.executives;
+    return state.executives.filter(exec => exec.branchId === form.branchId);
+  }, [state.executives, form.branchId]);
+
+  // Filter inventory items by selected category
+  const filteredInventory = useMemo(() => {
+    if (!selectedCategory) return state.inventory;
+    return state.inventory.filter(item => item.category === selectedCategory);
+  }, [state.inventory, selectedCategory]);
 
   function onSelectItem(inv: InventoryItem | null) {
     if (!inv) return;
     setForm(prev => ({ ...prev, item: inv.name, sku: inv.sku, unitPrice: inv.sellingPrice }));
     setNotice(null);
+  }
+
+  function handleBranchChange(e: ChangeEvent<HTMLSelectElement>) {
+    const branchId = e.target.value;
+    setForm(prev => ({ ...prev, branchId, execId: "" })); // Reset executive when branch changes
+  }
+
+  function handleCategoryChange(e: ChangeEvent<HTMLSelectElement>) {
+    const category = e.target.value;
+    setSelectedCategory(category);
+    setForm(prev => ({ ...prev, item: "", sku: "", unitPrice: 0 })); // Reset item when category changes
   }
   function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -27,7 +51,7 @@ export function AddSaleModal({ onClose }: { onClose: () => void }) {
     setState(prev => ({ ...prev, sales: [ { id: uid("S"), ...form, qty: Number(form.qty||0), unitPrice: Number(form.unitPrice||0) }, ...prev.sales ] }));
     onClose();
   }
-  const currentStock = (Array.isArray(state.inventory)?state.inventory:[]).find(i => i.sku === form.sku)?.stock ?? 0;
+  const currentStock = filteredInventory.find(i => i.sku === form.sku)?.stock ?? 0;
   const outOfStock = !form.sku || currentStock === 0 || form.qty > currentStock;
 
   return (
@@ -48,22 +72,31 @@ export function AddSaleModal({ onClose }: { onClose: () => void }) {
               <input type="date" value={form.date} onChange={(e: ChangeEvent<HTMLInputElement>) => setForm({ ...form, date: e.target.value })} className="w-full border border-slate-300 rounded-xl px-3 py-2" />
             </div>
             <div>
-              <label className="text-xs opacity-60">Executive *</label>
-              <select value={form.execId} onChange={(e: ChangeEvent<HTMLSelectElement>) => setForm({ ...form, execId: e.target.value })} className="w-full border border-slate-300 rounded-xl px-3 py-2">
-                {state.executives.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
-              </select>
-            </div>
-            <div>
               <label className="text-xs opacity-60">Branch *</label>
-              <select value={form.branchId} onChange={(e: ChangeEvent<HTMLSelectElement>) => setForm({ ...form, branchId: e.target.value })} className="w-full border border-slate-300 rounded-xl px-3 py-2">
+              <select value={form.branchId} onChange={handleBranchChange} className="w-full border border-slate-300 rounded-xl px-3 py-2">
+                <option value="">Select branch</option>
                 {state.branches.map(b => <option key={b.id} value={b.id}>{b.name} ({b.city})</option>)}
               </select>
             </div>
-            <div className="md:col-span-2">
+            <div>
+              <label className="text-xs opacity-60">Executive *</label>
+              <select value={form.execId} onChange={(e: ChangeEvent<HTMLSelectElement>) => setForm({ ...form, execId: e.target.value })} className="w-full border border-slate-300 rounded-xl px-3 py-2" disabled={!form.branchId}>
+                <option value="">Select executive</option>
+                {filteredExecutives.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs opacity-60">Category</label>
+              <select value={selectedCategory} onChange={handleCategoryChange} className="w-full border border-slate-300 rounded-xl px-3 py-2">
+                <option value="">All categories</option>
+                {(state.categories || []).map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
               <label className="text-xs opacity-60">Item *</label>
-              <select value={form.sku} onChange={(e: ChangeEvent<HTMLSelectElement>) => { const list = Array.isArray(state.inventory)?state.inventory:[]; const inv = list.find(i => i.sku === e.target.value) || null; setForm({ ...form, sku: e.target.value, item: inv?.name || "" }); onSelectItem(inv); }} className="w-full border border-slate-300 rounded-xl px-3 py-2">
+              <select value={form.sku} onChange={(e: ChangeEvent<HTMLSelectElement>) => { const inv = filteredInventory.find(i => i.sku === e.target.value) || null; setForm({ ...form, sku: e.target.value, item: inv?.name || "" }); onSelectItem(inv); }} className="w-full border border-slate-300 rounded-xl px-3 py-2" disabled={!selectedCategory}>
                 <option value="">Select item</option>
-                {(Array.isArray(state.inventory)?state.inventory:[]).map(i => <option key={i.id} value={i.sku}>{i.name} ({i.sku}){i.category?` – ${i.category}`:""}</option>)}
+                {filteredInventory.map(i => <option key={i.id} value={i.sku}>{i.name} ({i.sku})</option>)}
               </select>
             </div>
             <div>
@@ -71,11 +104,10 @@ export function AddSaleModal({ onClose }: { onClose: () => void }) {
               <input
                 type="number"
                 min={1}
-                max={(Array.isArray(state.inventory)?state.inventory:[]).find(i => i.sku === form.sku)?.stock ?? undefined}
+                max={filteredInventory.find(i => i.sku === form.sku)?.stock ?? undefined}
                 value={form.qty}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  const invList = Array.isArray(state.inventory) ? state.inventory : [];
-                  const matched = invList.find(i => i.sku === form.sku);
+                  const matched = filteredInventory.find(i => i.sku === form.sku);
                   const next = Number(e.target.value || 0);
                   if (matched && next > matched.stock) {
                     setNotice("Requested quantity exceeds stock");
@@ -88,7 +120,7 @@ export function AddSaleModal({ onClose }: { onClose: () => void }) {
                 className="w-full border border-slate-300 rounded-xl px-3 py-2"
               />
               <div className="text-xs opacity-60 mt-1">
-                Stock: {(Array.isArray(state.inventory)?state.inventory:[]).find(i => i.sku === form.sku)?.stock ?? 0}
+                Stock: {filteredInventory.find(i => i.sku === form.sku)?.stock ?? 0}
               </div>
               {notice && <p className="text-xs text-red-600 mt-1">{notice}</p>}
             </div>

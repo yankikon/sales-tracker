@@ -43,7 +43,8 @@ export function SignIn(): JSX.Element {
               type="email" 
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
-              className="w-full border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400" 
+              className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-900 placeholder-slate-500" 
+              style={{ backgroundColor: '#ffffff', color: '#1f2937' }}
               required 
             />
           </div>
@@ -53,7 +54,8 @@ export function SignIn(): JSX.Element {
               type="password" 
               value={password} 
               onChange={(e) => setPassword(e.target.value)} 
-              className="w-full border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400" 
+              className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-900 placeholder-slate-500" 
+              style={{ backgroundColor: '#ffffff', color: '#1f2937' }}
               required 
             />
           </div>

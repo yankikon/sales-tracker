@@ -79,7 +79,8 @@ export function Sales(): JSX.Element {
                     value={query} 
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)} 
                     placeholder="Bill / Item / SKU" 
-                    className="w-full border border-slate-300 dark:border-slate-600 rounded-xl pl-9 pr-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400" 
+                    className="w-full border border-slate-300 rounded-xl pl-9 pr-3 py-2 bg-white text-slate-900 placeholder-slate-500" 
+                    style={{ backgroundColor: '#ffffff', color: '#1f2937' }}
                   />
                 </div>
               </div>
@@ -88,7 +89,8 @@ export function Sales(): JSX.Element {
                 <select 
                   value={branch} 
                   onChange={(e: ChangeEvent<HTMLSelectElement>) => setBranch(e.target.value)} 
-                  className="w-full border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
+                  className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-900"
+                  style={{ backgroundColor: '#ffffff', color: '#1f2937' }}
                 >
                   <option value="">All</option>
                   {state.branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
@@ -99,7 +101,8 @@ export function Sales(): JSX.Element {
                 <select 
                   value={execId} 
                   onChange={(e: ChangeEvent<HTMLSelectElement>) => setExecId(e.target.value)} 
-                  className="w-full border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
+                  className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-900"
+                  style={{ backgroundColor: '#ffffff', color: '#1f2937' }}
                 >
                   <option value="">All</option>
                   {state.executives.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
@@ -112,7 +115,8 @@ export function Sales(): JSX.Element {
                 <select 
                   value={category} 
                   onChange={(e: ChangeEvent<HTMLSelectElement>) => setCategory(e.target.value)} 
-                  className="w-full border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
+                  className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-900"
+                  style={{ backgroundColor: '#ffffff', color: '#1f2937' }}
                 >
                   <option value="">All</option>
                   {(state.categories || []).map(c => <option key={c} value={c}>{c}</option>)}
@@ -124,7 +128,8 @@ export function Sales(): JSX.Element {
                   type="date" 
                   value={from} 
                   onChange={(e) => setFrom(e.target.value)} 
-                  className="w-full border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" 
+                  className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-900" 
+                  style={{ backgroundColor: '#ffffff', color: '#1f2937' }}
                 />
               </div>
               <div>
@@ -133,7 +138,8 @@ export function Sales(): JSX.Element {
                   type="date" 
                   value={to} 
                   onChange={(e) => setTo(e.target.value)} 
-                  className="w-full border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" 
+                  className="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-900" 
+                  style={{ backgroundColor: '#ffffff', color: '#1f2937' }}
                 />
               </div>
             </div>

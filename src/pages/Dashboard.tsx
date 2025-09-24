@@ -66,7 +66,8 @@ export function Dashboard(): JSX.Element {
                 type="date" 
                 value={from} 
                 onChange={(e) => setFrom(e.target.value)} 
-                className="border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" 
+                className="border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-900" 
+                style={{ backgroundColor: '#ffffff', color: '#1f2937' }}
               />
             </div>
             <div>
@@ -75,7 +76,8 @@ export function Dashboard(): JSX.Element {
                 type="date" 
                 value={to} 
                 onChange={(e) => setTo(e.target.value)} 
-                className="border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" 
+                className="border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-900" 
+                style={{ backgroundColor: '#ffffff', color: '#1f2937' }}
               />
             </div>
           </div>
@@ -100,11 +102,11 @@ export function Dashboard(): JSX.Element {
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={salesByExecData as any}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 dark:stroke-slate-700" />
-                  <XAxis dataKey="name" className="text-slate-600 dark:text-slate-400" />
-                  <YAxis className="text-slate-600 dark:text-slate-400" />
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
                   <Tooltip formatter={(v: number) => INR(v)} />
-                  <Bar dataKey="value" fill="#10B981" />
+                  <Bar dataKey="value" fill="#4CAF50" />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -119,11 +121,11 @@ export function Dashboard(): JSX.Element {
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={salesByDateData as any}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 dark:stroke-slate-700" />
-                  <XAxis dataKey="date" className="text-slate-600 dark:text-slate-400" />
-                  <YAxis className="text-slate-600 dark:text-slate-400" />
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
                   <Tooltip formatter={(v: number) => INR(v)} />
-                  <Line type="monotone" dataKey="value" stroke="#3B82F6" />
+                  <Line type="monotone" dataKey="value" stroke="#2196F3" />
                 </LineChart>
               </ResponsiveContainer>
             )}
@@ -140,11 +142,11 @@ export function Dashboard(): JSX.Element {
                 <PieChart>
                   <Pie data={salesByItemData as any} dataKey="value" nameKey="name" labelLine={false} label={false}>
                     {salesByItemData.map((_, i) => (
-                      <Cell key={i} fill={["#10B981","#3B82F6","#F59E0B","#EF4444","#06B6D4","#8B5CF6","#EC4899","#6B7280"][i % 8]} />
+                      <Cell key={i} fill={["#4CAF50","#2196F3","#FFB300","#FF7043","#26C6DA","#7E57C2","#9C27B0","#795548"][i % 8]} />
                     ))}
                   </Pie>
                   <Tooltip formatter={(v: number) => INR(v)} />
-                  <Legend className="text-slate-600 dark:text-slate-400" />
+                  <Legend />
                 </PieChart>
               </ResponsiveContainer>
             )}

@@ -55,18 +55,28 @@ export function Dashboard(): JSX.Element {
   }, [filteredSales]);
 
   return (
-    <div className="space-y-6" style={{ backgroundColor: '#F5F7FA' }}>
-      <Card style={{ backgroundColor: '#FFFFFF' }}>
+    <div className="space-y-6">
+      <Card>
         <CardHeader title="Filters" />
         <CardBody>
           <div className="flex flex-wrap items-end gap-3">
             <div>
-              <label className="block text-xs" style={{ color: '#475569' }}>From</label>
-              <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="border rounded-xl px-3 py-2" style={{ borderColor: '#E2E8F0' }} />
+              <label className="block text-xs text-slate-600 dark:text-slate-400">From</label>
+              <input 
+                type="date" 
+                value={from} 
+                onChange={(e) => setFrom(e.target.value)} 
+                className="border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" 
+              />
             </div>
             <div>
-              <label className="block text-xs" style={{ color: '#475569' }}>To</label>
-              <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="border rounded-xl px-3 py-2" style={{ borderColor: '#E2E8F0' }} />
+              <label className="block text-xs text-slate-600 dark:text-slate-400">To</label>
+              <input 
+                type="date" 
+                value={to} 
+                onChange={(e) => setTo(e.target.value)} 
+                className="border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" 
+              />
             </div>
           </div>
         </CardBody>
@@ -90,11 +100,11 @@ export function Dashboard(): JSX.Element {
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={salesByExecData as any}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 dark:stroke-slate-700" />
+                  <XAxis dataKey="name" className="text-slate-600 dark:text-slate-400" />
+                  <YAxis className="text-slate-600 dark:text-slate-400" />
                   <Tooltip formatter={(v: number) => INR(v)} />
-                  <Bar dataKey="value" fill="#4CAF50" />
+                  <Bar dataKey="value" fill="#10B981" />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -109,11 +119,11 @@ export function Dashboard(): JSX.Element {
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={salesByDateData as any}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 dark:stroke-slate-700" />
+                  <XAxis dataKey="date" className="text-slate-600 dark:text-slate-400" />
+                  <YAxis className="text-slate-600 dark:text-slate-400" />
                   <Tooltip formatter={(v: number) => INR(v)} />
-                  <Line type="monotone" dataKey="value" stroke="#2196F3" />
+                  <Line type="monotone" dataKey="value" stroke="#3B82F6" />
                 </LineChart>
               </ResponsiveContainer>
             )}
@@ -130,11 +140,11 @@ export function Dashboard(): JSX.Element {
                 <PieChart>
                   <Pie data={salesByItemData as any} dataKey="value" nameKey="name" labelLine={false} label={false}>
                     {salesByItemData.map((_, i) => (
-                      <Cell key={i} fill={["#4CAF50","#2196F3","#FFB300","#FF7043","#26C6DA","#7E57C2","#9C27B0","#795548"][i % 8]} />
+                      <Cell key={i} fill={["#10B981","#3B82F6","#F59E0B","#EF4444","#06B6D4","#8B5CF6","#EC4899","#6B7280"][i % 8]} />
                     ))}
                   </Pie>
                   <Tooltip formatter={(v: number) => INR(v)} />
-                  <Legend />
+                  <Legend className="text-slate-600 dark:text-slate-400" />
                 </PieChart>
               </ResponsiveContainer>
             )}
@@ -162,14 +172,16 @@ function TargetCard({ from, to }: { from: string; to: string }) {
     <Card>
       <CardBody>
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-slate-100 border border-slate-200 dark:bg-slate-700 dark:border-slate-600"><Target className="w-5 h-5" /></div>
+          <div className="p-2 rounded-xl bg-slate-100 border border-slate-200 dark:bg-slate-700 dark:border-slate-600">
+            <Target className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+          </div>
           <div className="flex-1">
-            <p className="text-xs opacity-60">Team Target (month)</p>
-            <p className="text-lg font-semibold">{INR(thisMonth.totals)} / {INR(thisMonth.target)}</p>
-            <div className="h-2 rounded-full overflow-hidden mt-2" style={{ backgroundColor: '#E2E8F0' }}>
-              <div className="h-2" style={{ width: `${Math.min(100, thisMonth.pct)}%`, backgroundColor: thisMonth.pct >= 70 ? '#16A34A' : '#DC2626' }} />
+            <p className="text-xs text-slate-600 dark:text-slate-400">Team Target (month)</p>
+            <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{INR(thisMonth.totals)} / {INR(thisMonth.target)}</p>
+            <div className="h-2 rounded-full overflow-hidden mt-2 bg-slate-200 dark:bg-slate-700">
+              <div className="h-2" style={{ width: `${Math.min(100, thisMonth.pct)}%`, backgroundColor: thisMonth.pct >= 70 ? '#10B981' : '#EF4444' }} />
             </div>
-            <p className="text-xs opacity-60 mt-1">{thisMonth.pct}% achieved</p>
+            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">{thisMonth.pct}% achieved</p>
           </div>
         </div>
       </CardBody>

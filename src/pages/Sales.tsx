@@ -72,22 +72,35 @@ export function Sales(): JSX.Element {
           <div className="space-y-4">
             <div className="grid lg:grid-cols-4 gap-3">
               <div className="lg:col-span-2">
-                <label className="text-xs opacity-60">Search</label>
+                <label className="text-xs text-slate-600 dark:text-slate-400">Search</label>
                 <div className="relative">
-                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 opacity-60" />
-                  <input value={query} onChange={(e: ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)} placeholder="Bill / Item / SKU" className="w-full border border-slate-300 rounded-xl pl-9 pr-3 py-2" />
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+                  <input 
+                    value={query} 
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)} 
+                    placeholder="Bill / Item / SKU" 
+                    className="w-full border border-slate-300 dark:border-slate-600 rounded-xl pl-9 pr-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400" 
+                  />
                 </div>
               </div>
               <div>
-                <label className="text-xs opacity-60">Branch</label>
-                <select value={branch} onChange={(e: ChangeEvent<HTMLSelectElement>) => setBranch(e.target.value)} className="w-full border border-slate-300 rounded-xl px-3 py-2">
+                <label className="text-xs text-slate-600 dark:text-slate-400">Branch</label>
+                <select 
+                  value={branch} 
+                  onChange={(e: ChangeEvent<HTMLSelectElement>) => setBranch(e.target.value)} 
+                  className="w-full border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
+                >
                   <option value="">All</option>
                   {state.branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-xs opacity-60">Executive</label>
-                <select value={execId} onChange={(e: ChangeEvent<HTMLSelectElement>) => setExecId(e.target.value)} className="w-full border border-slate-300 rounded-xl px-3 py-2">
+                <label className="text-xs text-slate-600 dark:text-slate-400">Executive</label>
+                <select 
+                  value={execId} 
+                  onChange={(e: ChangeEvent<HTMLSelectElement>) => setExecId(e.target.value)} 
+                  className="w-full border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
+                >
                   <option value="">All</option>
                   {state.executives.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
                 </select>
@@ -95,19 +108,33 @@ export function Sales(): JSX.Element {
             </div>
             <div className="grid lg:grid-cols-3 gap-3">
               <div>
-                <label className="text-xs opacity-60">Category</label>
-                <select value={category} onChange={(e: ChangeEvent<HTMLSelectElement>) => setCategory(e.target.value)} className="w-full border border-slate-300 rounded-xl px-3 py-2">
+                <label className="text-xs text-slate-600 dark:text-slate-400">Category</label>
+                <select 
+                  value={category} 
+                  onChange={(e: ChangeEvent<HTMLSelectElement>) => setCategory(e.target.value)} 
+                  className="w-full border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
+                >
                   <option value="">All</option>
                   {(state.categories || []).map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-xs opacity-60">From</label>
-                <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="w-full border border-slate-300 rounded-xl px-3 py-2" />
+                <label className="text-xs text-slate-600 dark:text-slate-400">From</label>
+                <input 
+                  type="date" 
+                  value={from} 
+                  onChange={(e) => setFrom(e.target.value)} 
+                  className="w-full border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" 
+                />
               </div>
               <div>
-                <label className="text-xs opacity-60">To</label>
-                <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="w-full border border-slate-300 rounded-xl px-3 py-2" />
+                <label className="text-xs text-slate-600 dark:text-slate-400">To</label>
+                <input 
+                  type="date" 
+                  value={to} 
+                  onChange={(e) => setTo(e.target.value)} 
+                  className="w-full border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" 
+                />
               </div>
             </div>
           </div>

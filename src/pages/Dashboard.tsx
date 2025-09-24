@@ -61,23 +61,21 @@ export function Dashboard(): JSX.Element {
         <CardBody>
           <div className="flex flex-wrap items-end gap-3">
             <div>
-              <label className="block text-xs text-slate-600 dark:text-slate-400">From</label>
+              <label className="block text-xs text-slate-600">From</label>
               <input 
                 type="date" 
                 value={from} 
                 onChange={(e) => setFrom(e.target.value)} 
                 className="border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-900" 
-                style={{ backgroundColor: '#ffffff', color: '#1f2937' }}
               />
             </div>
             <div>
-              <label className="block text-xs text-slate-600 dark:text-slate-400">To</label>
+              <label className="block text-xs text-slate-600">To</label>
               <input 
                 type="date" 
                 value={to} 
                 onChange={(e) => setTo(e.target.value)} 
                 className="border border-slate-300 rounded-xl px-3 py-2 bg-white text-slate-900" 
-                style={{ backgroundColor: '#ffffff', color: '#1f2937' }}
               />
             </div>
           </div>
@@ -174,16 +172,16 @@ function TargetCard({ from, to }: { from: string; to: string }) {
     <Card>
       <CardBody>
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-slate-100 border border-slate-200 dark:bg-slate-700 dark:border-slate-600">
-            <Target className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+          <div className="p-2 rounded-xl bg-slate-100 border border-slate-200">
+            <Target className="w-5 h-5 text-slate-600" />
           </div>
           <div className="flex-1">
-            <p className="text-xs text-slate-600 dark:text-slate-400">Team Target (month)</p>
-            <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">{INR(thisMonth.totals)} / {INR(thisMonth.target)}</p>
-            <div className="h-2 rounded-full overflow-hidden mt-2 bg-slate-200 dark:bg-slate-700">
+            <p className="text-xs text-slate-600">Team Target (month)</p>
+            <p className="text-lg font-semibold text-slate-900">{INR(thisMonth.totals)} / {INR(thisMonth.target)}</p>
+            <div className="h-2 rounded-full overflow-hidden mt-2 bg-slate-200">
               <div className="h-2" style={{ width: `${Math.min(100, thisMonth.pct)}%`, backgroundColor: thisMonth.pct >= 70 ? '#10B981' : '#EF4444' }} />
             </div>
-            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">{thisMonth.pct}% achieved</p>
+            <p className="text-xs text-slate-600 mt-1">{thisMonth.pct}% achieved</p>
           </div>
         </div>
       </CardBody>

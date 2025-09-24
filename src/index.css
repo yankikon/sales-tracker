@@ -2,4 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: light dark; }
+/* Force light controls even in iOS dark mode */
+:root, html, body, form, input, select, textarea, button {
+  color-scheme: light !important;
+}
+
+/* Base clean input */
+input, select, textarea {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #fff !important;
+  color: #111 !important;
+  border: 1px solid #e5e7eb;       /* gray-200 */
+  border-radius: 12px;
+  padding: 12px 14px;
+  line-height: 1.4;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  transition: box-shadow .15s, border-color .15s, background-color .15s;
+  caret-color: #111;
+}
+
+/* Focus state */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #111;               /* near-black */
+  box-shadow: 0 0 0 3px rgba(17,17,17,.08);
+}
+
+/* Placeholder */
+input::placeholder, textarea::placeholder {
+  color: #9ca3af;                   /* gray-400 */
+}
+
+/* iOS Safari autofill (kills black/yellow fill) */
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: #111 !important;
+  caret-color: #111;
+  transition: background-color 9999s ease-in-out 0s;
+  /* Paint white behind the autofill */
+  box-shadow: 0 0 0px 1000px #fff inset !important;
+}
+
+/* Prevent iOS dark inversion on inputs inside dark UI shells */
+.dark input, .dark select, .dark textarea {
+  background-color: #fff !important;
+  color: #111 !important;
+  border-color: #e5e7eb !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+}

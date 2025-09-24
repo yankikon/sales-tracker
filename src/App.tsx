@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Building2, Home, Settings, Users, Receipt, Moon, Sun, Boxes } from "lucide-react";
+import { Building2, Home, Settings, Users, Receipt, Boxes } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Dashboard } from "./pages/Dashboard";
 import { Executives } from "./pages/Executives";
@@ -10,7 +10,6 @@ import { InventoryPage } from "./pages/Inventory";
 import { useStore, ThemeCtx } from "./context/Store";
 import { useAuth } from "./context/Auth";
 import { SignIn } from "./pages/SignIn";
-import { colors } from "./lib/colors";
 
 const NAV: Array<{ key: Route; label: string; icon: LucideIcon }> = [
   { key: "dashboard", label: "Dashboard", icon: Home },
@@ -25,8 +24,7 @@ export default function App(): JSX.Element {
   const { state } = useStore();
   const { user, signOutUser, loading } = useAuth();
   const [route, setRoute] = useState<Route>("dashboard");
-  const [dark, setDark] = useState(false);
-  const theme = dark ? "dark" : "light";
+  const theme = "light";
   const ctxTheme = useMemo(() => theme, [theme]);
 
   if (!user && !loading) {
@@ -35,8 +33,8 @@ export default function App(): JSX.Element {
 
   return (
     <ThemeCtx.Provider value={ctxTheme}>
-      <div style={{ backgroundColor: colors.background, color: colors.foreground }} className="min-h-screen">
-        <header style={{ backgroundColor: colors.card, borderColor: colors.border }} className="sticky top-0 z-20 backdrop-blur border-b">
+      <div className="min-h-screen bg-white text-slate-900">
+        <header className="sticky top-0 z-20 bg-white/80 backdrop-blur border-b border-slate-200">
           <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
             {state.business.logo ? (
               <img 
@@ -45,67 +43,40 @@ export default function App(): JSX.Element {
                 className="w-8 h-8 object-cover rounded-lg"
               />
             ) : (
-              <Building2 className="w-6 h-6" style={{ color: colors.primary }} />
+              <Building2 className="w-6 h-6 text-emerald-600" />
             )}
             <div className="flex-1">
-              <h1 className="text-lg font-semibold" style={{ color: colors.foreground }}>{state.business.name || "Sales Executive Performance Tracker"}</h1>
-              {state.business.address && <p className="text-xs" style={{ color: colors.mutedForeground }}>{state.business.address}</p>}
+              <h1 className="text-lg font-semibold text-slate-900">{state.business.name || "Sales Executive Performance Tracker"}</h1>
+              {state.business.address && <p className="text-xs text-slate-600">{state.business.address}</p>}
             </div>
             {user && (
               <div className="flex items-center gap-2">
-                <span className="text-xs truncate max-w-[140px]" style={{ color: colors.mutedForeground }}>{user.email || user.displayName || "Signed in"}</span>
+                <span className="text-xs text-slate-600 truncate max-w-[140px]">{user.email || user.displayName || "Signed in"}</span>
                 <button 
                   onClick={signOutUser} 
-                  className="inline-flex items-center gap-2 text-xs border rounded-xl px-2 py-1"
-                  style={{ 
-                    backgroundColor: colors.surface, 
-                    borderColor: colors.border, 
-                    color: colors.foreground 
-                  }}
+                  className="inline-flex items-center gap-2 text-xs border border-slate-300 rounded-xl px-2 py-1 bg-white text-slate-700 hover:bg-slate-50"
                 >
                   Sign out
                 </button>
               </div>
             )}
-            <button 
-              onClick={() => setDark(!dark)} 
-              className="inline-flex items-center gap-2 text-xs border rounded-xl px-2 py-1"
-              style={{ 
-                backgroundColor: colors.surface, 
-                borderColor: colors.border, 
-                color: colors.foreground 
-              }}
-            >
-              {dark ? <Sun className="w-4 h-4"/> : <Moon className="w-4 h-4"/>}
-              {dark ? "Light" : "Dark"} Mode
-            </button>
           </div>
         </header>
 
         <main className="max-w-7xl mx-auto grid grid-cols-12 gap-4 px-4 py-6">
           <aside className="col-span-12 md:col-span-3 lg:col-span-2">
-            <nav style={{ backgroundColor: colors.card, borderColor: colors.border }} className="border rounded-2xl p-2">
+            <nav className="bg-white border border-slate-200 rounded-2xl p-2 shadow-sm">
               {NAV.map((n) => (
                 <button 
                   key={n.key} 
                   onClick={() => setRoute(n.key)}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left"
-                  style={{ 
-                    backgroundColor: route === n.key ? colors.accent : 'transparent',
-                    color: colors.foreground
-                  }}
-                  onMouseEnter={(e) => {
-                    if (route !== n.key) {
-                      e.currentTarget.style.backgroundColor = colors.muted;
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (route !== n.key) {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                    }
-                  }}
+                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left ${
+                    route === n.key 
+                      ? "bg-slate-100 text-slate-900" 
+                      : "text-slate-700 hover:bg-slate-50"
+                  }`}
                 >
-                  <n.icon className="w-4 h-4" style={{ color: route === n.key ? colors.primary : colors.mutedForeground }} />
+                  <n.icon className={`w-4 h-4 ${route === n.key ? "text-emerald-600" : "text-slate-500"}`} />
                   <span className="text-sm">{n.label}</span>
                 </button>
               ))}
@@ -121,7 +92,7 @@ export default function App(): JSX.Element {
           </section>
         </main>
 
-        <footer className="text-center text-xs py-6" style={{ color: colors.mutedForeground }}>© {new Date().getFullYear()} Sales Tracker – Local demo build</footer>
+        <footer className="text-center text-xs text-slate-600 py-6">© {new Date().getFullYear()} Sales Tracker – Local demo build</footer>
       </div>
     </ThemeCtx.Provider>
   );

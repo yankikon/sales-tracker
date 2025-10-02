@@ -3,12 +3,12 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 // Firebase web configuration provided by the user
 const firebaseConfig = {
-  apiKey: "AIzaSyCekEPTDqAdasJV8D1kL6SvGuGlFJSA_VE",
-  authDomain: "studio-7088434206-b7e16.firebaseapp.com",
-  projectId: "studio-7088434206-b7e16",
-  storageBucket: "studio-7088434206-b7e16.firebasestorage.app",
-  messagingSenderId: "302376318165",
-  appId: "1:302376318165:web:0cfcb88347eed5ff4a9e5c",
+  apiKey: "AIzaSyDhA0r0URHhPbGicpiBJo27WIQOZg49cCM",
+  authDomain: "sales-insights-k5dhc.firebaseapp.com",
+  projectId: "sales-insights-k5dhc",
+  storageBucket: "sales-insights-k5dhc.firebasestorage.app",
+  messagingSenderId: "699253426756",
+  appId: "1:699253426756:web:4d6f41ca6f686640144a11",
 };
 
 export const app = getApps().length ? getApps()[0]! : initializeApp(firebaseConfig);
